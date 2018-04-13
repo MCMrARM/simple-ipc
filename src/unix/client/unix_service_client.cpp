@@ -3,7 +3,6 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
-#include <simpleipc/common/io_handler.h>
 
 using namespace simpleipc::client;
 
@@ -25,15 +24,17 @@ void unix_service_client_impl::open(std::string const& path) {
         } catch (std::exception&) {}
         throw std::runtime_error("Failed to connect");
     }
-    io_handler::get_instance().add_socket(fd, [](int) {
-        printf("client data!\n");
-    });
+    connection = std::unique_ptr<unix_connection>(new unix_connection(fd));
+    connection->register_io_handler();
 }
 
 void unix_service_client_impl::close() {
     if (fd == -1)
         return;
-    io_handler::get_instance().remove_socket(fd);
+    if (connection) {
+        connection->unregister_io_handler();
+        connection.reset();
+    }
     shutdown(fd, SHUT_RDWR);
     if (::close(fd) < 0) {
         fd = -1;
@@ -41,6 +42,12 @@ void unix_service_client_impl::close() {
     }
     fd = -1;
     path = std::string();
+}
+
+void unix_service_client_impl::send_message(std::string const& method, nlohmann::json const& data) {
+    if (!connection)
+        throw std::runtime_error("No active connection to send the message on");
+    connection->send_message(method, data);
 }
 
 std::unique_ptr<service_client_impl> service_client_impl_factory::create_platform_service() {

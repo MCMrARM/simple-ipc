@@ -64,11 +64,14 @@ void unix_service_impl::handle_incoming() {
         return;
     unix_connection* conn = new unix_connection(fd);
     conn->set_close_callback(std::bind(&unix_service_impl::on_connection_closed, this, conn));
+    conn->register_io_handler();
     connections.insert(conn);
 }
 
 void unix_service_impl::on_connection_closed(unix_connection* conn) {
+    conn->unregister_io_handler();
     connections.erase(conn);
+    delete conn;
 }
 
 

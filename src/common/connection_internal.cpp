@@ -7,5 +7,5 @@ void connection_internal::send_message(std::string const& method, nlohmann::json
 }
 
 void connection_internal::handle_data_available() {
-    //
+    printf("data available!\n");
 }
