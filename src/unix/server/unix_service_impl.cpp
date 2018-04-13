@@ -25,6 +25,12 @@ void unix_service_impl::bind(std::string const& path) {
         } catch (std::exception&) {}
         throw std::runtime_error("Failed to bind socket");
     }
+    if (listen(fd, 32) < 0) {
+        try {
+            close();
+        } catch (std::exception&) {}
+        throw std::runtime_error("Failed to start listening on socket");
+    }
     io_handler::get_instance().add_socket(fd, [](int) {
         printf("data!\n");
     });
