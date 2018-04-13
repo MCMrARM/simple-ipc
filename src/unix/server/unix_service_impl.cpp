@@ -1,6 +1,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
+#include <simpleipc/common/io_handler.h>
 #include "unix_service_impl.h"
 
 using namespace simpleipc::server;
@@ -24,11 +25,15 @@ void unix_service_impl::bind(std::string const& path) {
         } catch (std::exception&) {}
         throw std::runtime_error("Failed to bind socket");
     }
+    io_handler::get_instance().add_socket(fd, [](int) {
+        printf("data!\n");
+    });
 }
 
 void unix_service_impl::close() {
     if (fd == -1)
         return;
+    io_handler::get_instance().remove_socket(fd);
     shutdown(fd, SHUT_RDWR);
     if (::close(fd) < 0) {
         fd = -1;
