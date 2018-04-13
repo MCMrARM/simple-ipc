@@ -3,8 +3,16 @@
 #include <unistd.h>
 #include <simpleipc/common/io_handler.h>
 #include "unix_service_impl.h"
+#include "../common/unix_connection.h"
 
 using namespace simpleipc::server;
+
+unix_service_impl::~unix_service_impl() {
+    for (unix_connection* conn : connections) {
+        conn->unregister_io_handler();
+        delete conn;
+    }
+}
 
 void unix_service_impl::bind(std::string const& path) {
     if (fd != -1)
@@ -31,9 +39,7 @@ void unix_service_impl::bind(std::string const& path) {
         } catch (std::exception&) {}
         throw std::runtime_error("Failed to start listening on socket");
     }
-    io_handler::get_instance().add_socket(fd, [](int) {
-        printf("data!\n");
-    });
+    io_handler::get_instance().add_socket(fd, [this](int) { handle_incoming(); });
 }
 
 void unix_service_impl::close() {
@@ -48,6 +54,21 @@ void unix_service_impl::close() {
     fd = -1;
     unlink(path.c_str());
     path = std::string();
+}
+
+void unix_service_impl::handle_incoming() {
+    sockaddr_storage ss;
+    socklen_t ss_len = sizeof(ss);
+    int fd = accept(this->fd, (sockaddr*) &ss, &ss_len);
+    if (fd < 0) // failed
+        return;
+    unix_connection* conn = new unix_connection(fd);
+    conn->set_close_callback(std::bind(&unix_service_impl::on_connection_closed, this, conn));
+    connections.insert(conn);
+}
+
+void unix_service_impl::on_connection_closed(unix_connection* conn) {
+    connections.erase(conn);
 }
 
 

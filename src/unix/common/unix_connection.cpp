@@ -1,8 +1,17 @@
 #include "unix_connection.h"
 
 #include <unistd.h>
+#include <simpleipc/common/io_handler.h>
 
 using namespace simpleipc;
+
+void unix_connection::register_io_handler() {
+    io_handler::get_instance().add_socket(fd, [this](int) { handle_data_available(); });
+}
+
+void unix_connection::unregister_io_handler() {
+    io_handler::get_instance().remove_socket(fd);
+}
 
 void unix_connection::send_data(const char* data, size_t datalen) {
     if (write(fd, data, datalen) != datalen)
