@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 
 namespace simpleipc {
+
 class connection {
 
 public:
@@ -14,4 +15,5 @@ public:
     }
 
 };
+
 }
