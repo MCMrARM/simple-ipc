@@ -13,7 +13,7 @@ private:
     int fd, efd;
     std::unordered_map<int, data_callback> cbs;
     bool running = true;
-    std::mutex cbm;
+    std::recursive_mutex cbm;
     std::thread thread;
 
     void run();
