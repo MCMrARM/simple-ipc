@@ -10,7 +10,7 @@ namespace simpleipc {
 class connection_internal : public connection {
 
 public:
-    using message_callback = std::function<void (const char*, size_t)>;
+    using message_callback = std::function<void (std::string const& method, nlohmann::json const& data)>;
     using close_callback = std::function<void ()>;
 
 private:
@@ -56,10 +56,10 @@ public:
     void send_message(std::string const& method, nlohmann::json const& data) override;
 
 protected:
-    void on_message(const char* data, size_t datalen) {
+    void on_message(std::string const& method, nlohmann::json const& data) {
         std::lock_guard<std::mutex> guard(callback_mutex);
         if (callback_message)
-            callback_message(data, datalen);
+            callback_message(method, data);
     }
 
     void on_close() {
