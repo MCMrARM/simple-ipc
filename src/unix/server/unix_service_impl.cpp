@@ -15,7 +15,9 @@ void unix_service_impl::bind(std::string const& path) {
     addr.sun_family = AF_UNIX;
     if (path.length() >= sizeof(addr.sun_path))
         throw std::runtime_error("Path is too long");
+    this->path = path;
     strcpy(addr.sun_path, path.c_str());
+    unlink(path.c_str());
     if (::bind(fd, (const sockaddr*) &addr, sizeof(addr)) < 0) {
         try {
             close();
@@ -33,6 +35,8 @@ void unix_service_impl::close() {
         throw std::runtime_error("Failed to close socket");
     }
     fd = -1;
+    unlink(path.c_str());
+    path = std::string();
 }
 
 

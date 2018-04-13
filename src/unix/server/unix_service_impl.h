@@ -10,6 +10,7 @@ class unix_service_impl : public service_impl {
 private:
     callback_interface* cb;
     int fd = -1;
+    std::string path;
 
 public:
     void set_callback_interface(callback_interface* cb) override {
