@@ -21,6 +21,8 @@ private:
     message_callback callback_message;
     close_callback callback_close;
     std::vector<char> buffer;
+    size_t buffer_start_off = 0;
+    size_t buffer_off = 0;
     encoding::encoding* current_encoding = encoding::encodings::get_default_encoding();
     size_t max_out_msg_size = MAX_BUFFER_SIZE;
 
