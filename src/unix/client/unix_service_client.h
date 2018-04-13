@@ -19,7 +19,7 @@ public:
 
     void open(std::string const& path) override;
 
-    void send_message(const char* data, size_t datalen) override {
+    void send_message(nlohmann::json const& data) override {
         //
     }
 

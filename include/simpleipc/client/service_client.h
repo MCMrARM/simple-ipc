@@ -23,8 +23,8 @@ public:
         impl->open(path);
     }
 
-    void send_message(const char* data, size_t datalen) override {
-        impl->send_message(data, datalen);
+    void send_message(nlohmann::json const& data) override {
+        impl->send_message(data);
     }
 
 };

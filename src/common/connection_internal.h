@@ -2,6 +2,8 @@
 
 #include <simpleipc/common/connection.h>
 #include <mutex>
+#include "encoding/encoding.h"
+#include "encoding/encodings.h"
 
 namespace simpleipc {
 
@@ -12,11 +14,24 @@ public:
     using close_callback = std::function<void ()>;
 
 private:
+    static const size_t BUFFER_SIZE = 1024 * 16;
+    static const size_t MAX_BUFFER_SIZE = 1024 * 512;
+
     std::mutex callback_mutex;
     message_callback callback_message;
     close_callback callback_close;
+    std::vector<char> buffer;
+    encoding::encoding* current_encoding = encoding::encodings::get_default_encoding();
+    size_t max_out_msg_size = MAX_BUFFER_SIZE;
 
 public:
+    connection_internal() : buffer(BUFFER_SIZE) {
+    }
+
+    inline size_t get_max_out_msg_size() const {
+        return max_out_msg_size;
+    }
+
     void set_message_callback(message_callback callback) {
         std::lock_guard<std::mutex> guard(callback_mutex);
         callback_message = callback;
@@ -36,9 +51,7 @@ public:
     virtual ssize_t read_data(char* data, size_t datalen) = 0;
 
 
-    virtual void send_message(const char* data, size_t datalen) {
-        send_data(data, datalen);
-    }
+    void send_message(nlohmann::json const& data) override;
 
 protected:
     void on_message(const char* data, size_t datalen) {

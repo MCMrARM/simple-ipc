@@ -21,7 +21,7 @@ public:
 
     virtual void open(std::string const& path) = 0;
 
-    virtual void send_message(const char* data, size_t datalen) = 0;
+    virtual void send_message(nlohmann::json const& data) = 0;
 
     virtual void close() = 0;
 
