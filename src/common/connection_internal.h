@@ -51,7 +51,7 @@ public:
     virtual ssize_t read_data(char* data, size_t datalen) = 0;
 
 
-    void send_message(nlohmann::json const& data) override;
+    void send_message(std::string const& method, nlohmann::json const& data) override;
 
 protected:
     void on_message(const char* data, size_t datalen) {
