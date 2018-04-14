@@ -62,8 +62,8 @@ void encoding::json::read_message(const char* buf, size_t buf_size, message_cont
             ret.set(error_message(error_data["code"], error_data["message"], error_data["data"]));
     } else {
         if (msg_id != data.end() && msg_id->is_number())
-            ret.set(response_message(*msg_id, data["data"]));
+            ret.set(response_message(*msg_id, data["result"]));
         else
-            ret.set(response_message(data["data"]));
+            ret.set(response_message(data["result"]));
     }
 }

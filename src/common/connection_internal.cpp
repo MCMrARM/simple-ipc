@@ -57,7 +57,7 @@ void connection_internal::on_message(message_container const& msg) {
             break;
         }
         case message_container::message_type::response: {
-            printf("Got reponse message: data=%s\n", current_message.message_rpc.data().dump().c_str());
+            printf("Got reponse message: data=%s\n", current_message.message_response.data().dump().c_str());
             handler->handle_message(*this, msg.message_response);
             break;
         }
