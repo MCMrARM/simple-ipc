@@ -13,9 +13,10 @@ void rpc_handler::add_handler(std::string const& method, call_handler_async hand
 }
 
 void rpc_handler::invoke(std::string const& method, nlohmann::json const& data, result_handler handler) {
-    if (handlers.count(method) < 0)
+    auto h = handlers.find(method);
+    if (h == handlers.end())
         throw std::runtime_error("No handler available for this method");
-    handlers.at(method)(method, data, std::move(handler));
+    h->second(method, data, std::move(handler));
 }
 
 void rpc_handler::invoke(connection& conn, rpc_message const& msg) {
