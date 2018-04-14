@@ -14,11 +14,7 @@ public:
     class callback_interface {
 
     public:
-        virtual bool connect(connection const& client, nlohmann::json const& req) = 0;
-
-        virtual void disconnect(connection const& client) = 0;
-
-        virtual void handle(connection const& client, nlohmann::json const& req) = 0;
+        virtual void handle_message(connection const& client, rpc_message const& req) = 0;
 
     };
 
