@@ -8,9 +8,9 @@ namespace simpleipc {
 
 struct rpc_result {
 
-    const rpc_error_code error_code;
-    const std::string error_text;
-    const nlohmann::json data;
+    rpc_error_code error_code;
+    std::string error_text;
+    nlohmann::json data;
 
     static rpc_result response(nlohmann::json data) {
         return {rpc_error_codes::success, std::string(), std::move(data)};
