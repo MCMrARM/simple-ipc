@@ -1,4 +1,8 @@
 #include <simpleipc/common/rpc_handler.h>
+#include <simpleipc/common/connection.h>
+#include <simpleipc/common/message/rpc_message.h>
+#include <simpleipc/common/message/response_message.h>
+#include <simpleipc/common/message/error_message.h>
 
 using namespace simpleipc;
 
@@ -12,4 +16,20 @@ void rpc_handler::invoke(std::string const& method, nlohmann::json const& data, 
     if (handlers.count(method) < 0)
         throw std::runtime_error("No handler available for this method");
     handlers.at(method)(method, data, std::move(handler));
+}
+
+void rpc_handler::invoke(connection& conn, rpc_message const& msg) {
+    if (msg.has_id()) {
+        message_id id = msg.id();
+        connection* conn_ptr = &conn;
+        invoke(msg.method(), msg.data(), [conn_ptr, id](rpc_result result) { // TODO: the connection may be destroyed before, change to shared_ptr
+            if (result.success())
+                conn_ptr->send_message(response_message(id, std::move(result._data)));
+            else
+                conn_ptr->send_message(error_message(id, result._error_code, std::move(result._error_text),
+                                                      std::move(result._data)));
+        });
+    } else {
+        invoke(msg.method(), msg.data(), [](rpc_result) {});
+    }
 }

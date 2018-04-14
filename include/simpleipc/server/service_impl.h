@@ -14,7 +14,7 @@ public:
     class callback_interface {
 
     public:
-        virtual void handle_message(connection const& client, rpc_message const& req) = 0;
+        virtual void handle_message(connection& client, rpc_message const& req) = 0;
 
     };
 

@@ -6,10 +6,13 @@
 
 namespace simpleipc {
 
+class rpc_message;
+class connection;
+
 class rpc_handler {
 
 public:
-    using result_handler = std::function<void (rpc_result const&)>;
+    using result_handler = std::function<void (rpc_result)>;
 
     using call_handler_async = std::function<void (std::string const& method, nlohmann::json const& data, result_handler)>;
     using call_handler_async_data_only = std::function<void (nlohmann::json const& data, result_handler)>;
@@ -41,6 +44,8 @@ public:
 
 
     void invoke(std::string const& method, nlohmann::json const& data, result_handler handler);
+
+    void invoke(connection& conn, rpc_message const& msg);
 
 };
 

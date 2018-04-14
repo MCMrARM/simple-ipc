@@ -2,12 +2,13 @@
 
 #include <nlohmann/json.hpp>
 #include "../common/connection.h"
+#include "../common/rpc_handler.h"
 #include "service_impl.h"
 
 namespace simpleipc {
 namespace server {
 
-class service : public service_impl::callback_interface {
+class service : public service_impl::callback_interface, public rpc_handler {
 
 private:
     std::unique_ptr<service_impl> impl;
@@ -23,6 +24,10 @@ public:
 
     ~service() {
         impl->close();
+    }
+
+    void handle_message(connection& client, simpleipc::rpc_message const& req) override {
+        invoke(client, req);
     }
 
 };
