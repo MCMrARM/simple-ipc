@@ -2,10 +2,6 @@
 
 using namespace simpleipc;
 
-void connection_internal::send_message(std::string const& method, nlohmann::json const& data) {
-    current_encoding->send_message(*this, method, data);
-}
-
 void connection_internal::handle_data_available() {
     while (true) {
         if (buffer_off == buffer.size()) {
@@ -38,12 +34,17 @@ void connection_internal::handle_data_available() {
             if (c < 0)
                 break;
             try {
-                auto msg = current_encoding->read_message(&buffer.data()[buffer_start_off], (size_t) c);
-                printf("Got message: method=%s, data=%s\n", msg.method.c_str(), msg.data.dump().c_str());
+                current_encoding->read_message(&buffer.data()[buffer_start_off], (size_t) c, current_message);
+                if (current_message.type == message_container::message_type::rpc)
+                    printf("Got rpc message: method=%s, data=%s\n", current_message.message_rpc.method().c_str(),
+                           current_message.message_rpc.data().dump().c_str());
+                else
+                    printf("Got a message\n");
             } catch (std::exception& e) {
                 printf("Error processing message: %s\n", e.what());
                 // TODO: disconnect
             }
+            current_message.clear();
 
             buffer_start_off += c;
             check_start = buffer_off;

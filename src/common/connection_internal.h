@@ -25,6 +25,7 @@ private:
     size_t buffer_off = 0;
     encoding::encoding* current_encoding = encoding::encodings::get_default_encoding();
     size_t max_out_msg_size = MAX_BUFFER_SIZE;
+    message_container current_message;
 
 public:
     connection_internal() : buffer(BUFFER_SIZE) {
@@ -53,7 +54,17 @@ public:
     virtual ssize_t read_data(char* data, size_t datalen) = 0;
 
 
-    void send_message(std::string const& method, nlohmann::json const& data) override;
+    virtual void send_message(rpc_message const& msg) {
+        current_encoding->send_message(*this, msg);
+    }
+
+    virtual void send_message(response_message const& msg) {
+        current_encoding->send_message(*this, msg);
+    }
+
+    virtual void send_message(error_message const& msg) {
+        current_encoding->send_message(*this, msg);
+    }
 
 protected:
     void on_message(std::string const& method, nlohmann::json const& data) {

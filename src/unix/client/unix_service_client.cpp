@@ -44,10 +44,10 @@ void unix_service_client_impl::close() {
     path = std::string();
 }
 
-void unix_service_client_impl::send_message(std::string const& method, nlohmann::json const& data) {
+void unix_service_client_impl::send_message(rpc_message const& msg) {
     if (!connection)
         throw std::runtime_error("No active connection to send the message on");
-    connection->send_message(method, data);
+    connection->send_message(msg);
 }
 
 std::unique_ptr<service_client_impl> service_client_impl_factory::create_platform_service() {

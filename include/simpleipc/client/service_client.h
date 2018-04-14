@@ -7,7 +7,7 @@
 namespace simpleipc {
 namespace client {
 
-class service_client : public connection, private service_client_impl::callback_interface {
+class service_client : private service_client_impl::callback_interface {
 
 private:
     std::unique_ptr<service_client_impl> impl;
@@ -23,9 +23,10 @@ public:
         impl->open(path);
     }
 
-    void send_message(std::string const& method, nlohmann::json const& data) override {
-        impl->send_message(method, data);
+    void send_message(rpc_message const& msg) {
+        impl->send_message(msg);
     }
+
 
 };
 
