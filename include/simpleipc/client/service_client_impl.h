@@ -3,17 +3,22 @@
 #include <string>
 #include <nlohmann/json.hpp>
 #include "../common/connection.h"
+#include "../common/connection_handler.h"
 
 namespace simpleipc {
 namespace client {
 
-class service_client_impl {
+class service_client_impl : public connection_handler {
 
 public:
     class callback_interface {
 
     public:
-        virtual void handle(char* data, size_t datalen) = 0;
+        virtual void connection_closed() = 0;
+
+        virtual void handle_message(response_message const& msg) = 0;
+
+        virtual void handle_message(error_message const& msg) = 0;
 
     };
 

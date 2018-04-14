@@ -63,17 +63,16 @@ void unix_service_impl::handle_incoming() {
     if (fd < 0) // failed
         return;
     unix_connection* conn = new unix_connection(fd);
-    conn->set_close_callback(std::bind(&unix_service_impl::on_connection_closed, this, conn));
+    conn->set_handler(this);
     conn->register_io_handler();
     connections.insert(conn);
 }
 
-void unix_service_impl::on_connection_closed(unix_connection* conn) {
-    conn->unregister_io_handler();
-    connections.erase(conn);
-    delete conn;
+void unix_service_impl::connection_closed(connection& conn) {
+    ((unix_connection&) conn).unregister_io_handler();
+    connections.erase((unix_connection*) &conn);
+    delete &conn;
 }
-
 
 std::unique_ptr<service_impl> service_impl_factory::create_platform_service() {
     return std::unique_ptr<service_impl>(new unix_service_impl());

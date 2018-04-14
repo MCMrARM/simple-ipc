@@ -3,11 +3,12 @@
 #include <string>
 #include <nlohmann/json.hpp>
 #include "../common/connection.h"
+#include "../common/connection_handler.h"
 
 namespace simpleipc {
 namespace server {
 
-class service_impl {
+class service_impl : public connection_handler {
 
 public:
     class callback_interface {

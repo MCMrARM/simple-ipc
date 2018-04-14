@@ -1,6 +1,7 @@
 #pragma once
 
 #include <simpleipc/common/connection.h>
+#include <simpleipc/common/connection_handler.h>
 #include <mutex>
 #include "encoding/encoding.h"
 #include "encoding/encodings.h"
@@ -17,9 +18,7 @@ private:
     static const size_t BUFFER_SIZE = 1024 * 16;
     static const size_t MAX_BUFFER_SIZE = 1024 * 512;
 
-    std::mutex callback_mutex;
-    message_callback callback_message;
-    close_callback callback_close;
+    connection_handler* handler;
     std::vector<char> buffer;
     size_t buffer_start_off = 0;
     size_t buffer_off = 0;
@@ -35,14 +34,8 @@ public:
         return max_out_msg_size;
     }
 
-    void set_message_callback(message_callback callback) {
-        std::lock_guard<std::mutex> guard(callback_mutex);
-        callback_message = callback;
-    }
-
-    void set_close_callback(close_callback callback) {
-        std::lock_guard<std::mutex> guard(callback_mutex);
-        callback_close = callback;
+    void set_handler(connection_handler* handler) {
+        this->handler = handler;
     }
 
     virtual void register_io_handler() = 0;
@@ -67,16 +60,10 @@ public:
     }
 
 protected:
-    void on_message(std::string const& method, nlohmann::json const& data) {
-        std::lock_guard<std::mutex> guard(callback_mutex);
-        if (callback_message)
-            callback_message(method, data);
-    }
+    void on_message(message_container const& msg);
 
     void on_close() {
-        std::lock_guard<std::mutex> guard(callback_mutex);
-        if (callback_close)
-            callback_close();
+        handler->connection_closed(*this);
     }
 
 

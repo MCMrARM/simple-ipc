@@ -18,8 +18,6 @@ private:
 
     void handle_incoming();
 
-    void on_connection_closed(unix_connection* conn);
-
 public:
     ~unix_service_impl();
 
@@ -30,6 +28,8 @@ public:
     void bind(std::string const& path) override;
 
     void close() override;
+
+    void connection_closed(connection& conn) override;
 
 };
 

@@ -35,11 +35,7 @@ void connection_internal::handle_data_available() {
                 break;
             try {
                 current_encoding->read_message(&buffer.data()[buffer_start_off], (size_t) c, current_message);
-                if (current_message.type == message_container::message_type::rpc)
-                    printf("Got rpc message: method=%s, data=%s\n", current_message.message_rpc.method().c_str(),
-                           current_message.message_rpc.data().dump().c_str());
-                else
-                    printf("Got a message\n");
+                on_message(current_message);
             } catch (std::exception& e) {
                 printf("Error processing message: %s\n", e.what());
                 // TODO: disconnect
@@ -49,5 +45,30 @@ void connection_internal::handle_data_available() {
             buffer_start_off += c;
             check_start = buffer_off;
         }
+    }
+}
+
+void connection_internal::on_message(message_container const& msg) {
+    switch (msg.type) {
+        case message_container::message_type::rpc: {
+            printf("Got rpc message: method=%s, data=%s\n", current_message.message_rpc.method().c_str(),
+                   current_message.message_rpc.data().dump().c_str());
+            handler->handle_message(*this, msg.message_response);
+            break;
+        }
+        case message_container::message_type::response: {
+            printf("Got reponse message: data=%s\n", current_message.message_rpc.data().dump().c_str());
+            handler->handle_message(*this, msg.message_response);
+            break;
+        }
+        case message_container::message_type::error: {
+            printf("Got error message: code=%i, message=%s, data=%s\n", current_message.message_error.error_code(),
+                   current_message.message_error.error_text().c_str(),
+                   current_message.message_error.data().dump().c_str());
+            handler->handle_message(*this, msg.message_error);
+            break;
+        }
+        default:
+            throw std::runtime_error("Invalid message type");
     }
 }

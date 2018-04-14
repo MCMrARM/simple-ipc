@@ -22,12 +22,16 @@ private:
     std::recursive_mutex cb_mutex;
     std::unordered_map<message_id, rpc_result_callback> cbs;
 
-    void handle(char* data, size_t datalen) override {}
+    void handle_message(response_message const& msg) override;
+
+    void handle_message(error_message const& msg) override;
 
 
     void send_message(rpc_message const& msg);
 
     void add_rpc_cb(message_id msg, rpc_result_callback cb);
+
+    rpc_result_callback get_rpc_cb(message_id msg);
 
 public:
     service_client(std::unique_ptr<service_client_impl> impl) : impl(std::move(impl)), next_message_id(0) {
@@ -40,6 +44,8 @@ public:
     rpc_call rpc(std::string method, nlohmann::json data) {
         return rpc_call(*this, std::move(method), std::move(data));
     }
+
+    void connection_closed() override {}
 
 
 };
