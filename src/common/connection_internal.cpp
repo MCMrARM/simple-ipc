@@ -22,7 +22,7 @@ void connection_internal::handle_data_available() {
             }
         }
         ssize_t n = read_data(&buffer.data()[buffer_off], buffer.size() - buffer_off);
-        if (n < 0)
+        if (n <= 0)
             return;
         size_t check_start = buffer_off;
         buffer_off += n;
