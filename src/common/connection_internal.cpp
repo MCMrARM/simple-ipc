@@ -59,20 +59,26 @@ void connection_internal::handle_data_available() {
 void connection_internal::on_message(message_container const& msg) {
     switch (msg.type) {
         case message_container::message_type::rpc: {
+#ifdef SIMPLEIPC_DEBUG_LOGGING
             printf("Got rpc message: method=%s, data=%s\n", current_message.message_rpc.method().c_str(),
                    current_message.message_rpc.data().dump().c_str());
+#endif
             handler->handle_message(*this, msg.message_rpc);
             break;
         }
         case message_container::message_type::response: {
+#ifdef SIMPLEIPC_DEBUG_LOGGING
             printf("Got reponse message: data=%s\n", current_message.message_response.data().dump().c_str());
+#endif
             handler->handle_message(*this, msg.message_response);
             break;
         }
         case message_container::message_type::error: {
+#ifdef SIMPLEIPC_DEBUG_LOGGING
             printf("Got error message: code=%i, message=%s, data=%s\n", current_message.message_error.error_code(),
                    current_message.message_error.error_text().c_str(),
                    current_message.message_error.data().dump().c_str());
+#endif
             handler->handle_message(*this, msg.message_error);
             break;
         }

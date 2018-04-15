@@ -60,7 +60,9 @@ void unix_service_impl::handle_incoming() {
     socklen_t ss_len = sizeof(ss);
     int fd = accept(this->fd, (sockaddr*) &ss, &ss_len);
     if (fd < 0) { // failed
-        printf("accept failed\n");
+#ifdef SIMPLEIPC_DEBUG_LOGGING
+        printf("accept() failed\n");
+#endif
         return;
     }
     std::shared_ptr<unix_connection> conn (new unix_connection(fd));
