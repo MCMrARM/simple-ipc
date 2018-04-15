@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <vector>
 
 namespace simpleipc {
 namespace encoding {
@@ -23,6 +24,8 @@ public:
     static encoding* get_encoding_by_name(std::string const& name);
 
     static encoding* get_default_encoding();
+
+    static std::vector<std::string> get_preferred_encodings();
 
 };
 

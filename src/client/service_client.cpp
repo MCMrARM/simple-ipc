@@ -1,6 +1,8 @@
 #include <simpleipc/client/service_client.h>
 #include <simpleipc/common/message/response_message.h>
 #include <simpleipc/common/message/error_message.h>
+#include <simpleipc/common/version.h>
+#include "../common/encoding/encodings.h"
 
 using namespace simpleipc::client;
 
@@ -38,4 +40,11 @@ void service_client::handle_message(error_message const& msg) {
     auto cb = get_rpc_cb(msg.id());
     if (cb)
         cb(rpc_result::error(msg.error_code(), msg.error_text(), msg.data()));
+}
+
+void service_client::send_hello_message() {
+    rpc(".hello", {
+            {"version", version::current_version},
+            {"encodings", encoding::encodings::get_preferred_encodings()}
+    }).call();
 }

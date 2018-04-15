@@ -39,6 +39,7 @@ public:
     }
     service_client(std::string const& path) : service_client(service_client_impl_factory::create_platform_service()) {
         impl->open(path);
+        send_hello_message();
     }
 
     rpc_call rpc(std::string method, nlohmann::json data) {
@@ -46,6 +47,9 @@ public:
     }
 
     void connection_closed() override {}
+
+
+    void send_hello_message();
 
 
 };

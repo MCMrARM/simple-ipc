@@ -23,3 +23,7 @@ encoding* encodings::get_encoding_by_name(std::string const& name) {
         return nullptr;
     return it->second.get();
 }
+
+std::vector<std::string> encodings::get_preferred_encodings() {
+    return {"cbor", "json"};
+}
