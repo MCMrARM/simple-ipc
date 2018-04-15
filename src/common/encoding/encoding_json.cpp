@@ -41,7 +41,7 @@ void encoding::json::send_json(connection_internal& conn, nlohmann::json const& 
 ssize_t encoding::json::check_read_message_complete(const char* buf, size_t buf_size, size_t last_read_off) {
     for (size_t i = last_read_off; i < buf_size; i++) {
         if (buf[i] == '\n' || buf[i] == '\0')
-            return i;
+            return i + 1;
     }
     return -1;
 }

@@ -43,7 +43,7 @@ void connection_internal::handle_data_available() {
             current_message.clear();
 
             buffer_start_off += c;
-            check_start = buffer_off;
+            check_start = buffer_start_off;
         }
     }
 }
