@@ -2,12 +2,14 @@
 
 #include <functional>
 #include <nlohmann/json.hpp>
-#include "rpc_result.h"
+#include "../common/rpc_result.h"
 
 namespace simpleipc {
 
 class rpc_message;
 class connection;
+
+namespace server {
 
 class rpc_handler {
 
@@ -35,5 +37,7 @@ public:
     void invoke(connection& conn, rpc_message const& msg);
 
 };
+
+}
 
 }

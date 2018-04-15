@@ -1,6 +1,6 @@
 #pragma once
 
-#include <simpleipc/common/rpc_handler.h>
+#include <simpleipc/server/rpc_handler.h>
 
 namespace simpleipc {
 namespace server {

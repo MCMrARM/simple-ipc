@@ -2,7 +2,7 @@
 
 #include <nlohmann/json.hpp>
 #include "../common/connection.h"
-#include "../common/rpc_handler.h"
+#include "rpc_handler.h"
 #include "service_impl.h"
 
 namespace simpleipc {

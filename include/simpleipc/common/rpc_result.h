@@ -6,12 +6,14 @@
 
 namespace simpleipc {
 
+namespace server {
 class rpc_handler;
+}
 
 struct rpc_result {
 
 private:
-    friend class rpc_handler;
+    friend class server::rpc_handler;
 
     rpc_error_code _error_code;
     std::string _error_text;

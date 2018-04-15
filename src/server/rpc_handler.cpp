@@ -1,10 +1,10 @@
-#include <simpleipc/common/rpc_handler.h>
+#include <simpleipc/server/rpc_handler.h>
 #include <simpleipc/common/connection.h>
 #include <simpleipc/common/message/rpc_message.h>
 #include <simpleipc/common/message/response_message.h>
 #include <simpleipc/common/message/error_message.h>
 
-using namespace simpleipc;
+using namespace simpleipc::server;
 
 void rpc_handler::add_handler_async(std::string const& method, call_handler_async handler) {
     if (handlers.count(method) > 0)
