@@ -11,7 +11,7 @@ public:
     default_rpc_handler();
 
 private:
-    rpc_result handle_hello(nlohmann::json const& data);
+    rpc_result handle_hello(connection& conn, nlohmann::json const& data);
 
 };
 

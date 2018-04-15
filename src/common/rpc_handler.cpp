@@ -12,18 +12,18 @@ void rpc_handler::add_handler(std::string const& method, call_handler_async hand
     handlers[method] = std::move(handler);
 }
 
-void rpc_handler::invoke(std::string const& method, nlohmann::json const& data, result_handler handler) {
+void rpc_handler::invoke(connection& conn, std::string const& method, nlohmann::json const& data, result_handler handler) {
     auto h = handlers.find(method);
     if (h == handlers.end())
         throw std::runtime_error("No handler available for this method");
-    h->second(method, data, std::move(handler));
+    h->second(conn, method, data, std::move(handler));
 }
 
 void rpc_handler::invoke(connection& conn, rpc_message const& msg) {
     if (msg.has_id()) {
         message_id id = msg.id();
         connection* conn_ptr = &conn;
-        invoke(msg.method(), msg.data(), [conn_ptr, id](rpc_result result) { // TODO: the connection may be destroyed before, change to shared_ptr
+        invoke(conn, msg.method(), msg.data(), [conn_ptr, id](rpc_result result) { // TODO: the connection may be destroyed before, change to shared_ptr
             if (result.success())
                 conn_ptr->send_message(response_message(id, std::move(result._data)));
             else
@@ -31,6 +31,6 @@ void rpc_handler::invoke(connection& conn, rpc_message const& msg) {
                                                       std::move(result._data)));
         });
     } else {
-        invoke(msg.method(), msg.data(), [](rpc_result) {});
+        invoke(conn, msg.method(), msg.data(), [](rpc_result) {});
     }
 }
