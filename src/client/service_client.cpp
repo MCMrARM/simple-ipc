@@ -3,6 +3,7 @@
 #include <simpleipc/common/message/error_message.h>
 #include <simpleipc/common/version.h>
 #include "../common/encoding/encodings.h"
+#include "../common/connection_internal.h"
 
 using namespace simpleipc::client;
 
@@ -43,8 +44,15 @@ void service_client::handle_message(error_message const& msg) {
 }
 
 void service_client::send_hello_message() {
-    rpc(".hello", {
+    auto res = rpc(".hello", {
             {"version", version::current_version},
             {"encodings", encoding::encodings::get_preferred_encodings()}
     }).call();
+    if (!res.success())
+        return;
+    auto conn = impl->get_connection();
+    std::string enc = res.data().at("encoding");
+    if (conn != nullptr)
+        ((connection_internal*) conn)->set_encoding(
+                encoding::encodings::get_encoding_by_name(res.data().at("encoding")));
 }

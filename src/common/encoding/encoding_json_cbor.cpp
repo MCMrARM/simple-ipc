@@ -29,8 +29,13 @@ void encoding::json_cbor::send_json(connection_internal& conn, nlohmann::json co
 
 ssize_t encoding::json_cbor::check_read_message_complete(const char* buf, size_t buf_size, size_t last_read_off) {
     size_t varint_size = buf_size;
-    auto size = varint::decode_unsigned(buf, buf_size, &varint_size);
-    return buf_size >= size + varint_size;
+    unsigned long long size;
+    if (!varint::try_decode_unsigned(buf, buf_size, size, &varint_size))
+        return -1;
+    size_t total_size = size + varint_size;
+    if (buf_size >= total_size)
+        return total_size;
+    return -1;
 }
 
 void encoding::json_cbor::read_message(const char* buf, size_t buf_size, message_container& ret) {

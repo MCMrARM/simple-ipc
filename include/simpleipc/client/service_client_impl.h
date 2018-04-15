@@ -28,6 +28,8 @@ public:
 
     virtual void send_message(rpc_message const& msg) = 0;
 
+    virtual connection* get_connection() = 0;
+
     virtual void close() = 0;
 
 };

@@ -27,7 +27,7 @@ void connection_internal::handle_data_available() {
         size_t check_start = buffer_off;
         buffer_off += n;
         // process all messages
-        while (true) {
+        while (buffer_off > buffer_start_off) {
             ssize_t c = current_encoding->check_read_message_complete(&buffer.data()[buffer_start_off],
                                                                       buffer_off - buffer_start_off,
                                                                       check_start - buffer_start_off);

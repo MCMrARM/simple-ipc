@@ -20,6 +20,10 @@ public:
 
     void close() override;
 
+    simpleipc::connection* get_connection() override {
+        return connection.get();
+    }
+
 };
 
 }
