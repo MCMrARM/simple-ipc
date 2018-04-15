@@ -14,7 +14,7 @@ void encoding::json_cbor::send_message(connection_internal& conn, response_messa
 }
 
 void encoding::json_cbor::send_message(connection_internal& conn, error_message const& msg) {
-    send_json(conn, {get_id_json(msg), msg.error_code(), msg.error_text()});
+    send_json(conn, {get_id_json(msg), msg.error_code(), msg.error_text(), msg.data()});
 }
 
 void encoding::json_cbor::send_json(connection_internal& conn, nlohmann::json const& data) {

@@ -3,6 +3,7 @@
 #include <simpleipc/common/message/rpc_message.h>
 #include <simpleipc/common/message/response_message.h>
 #include <simpleipc/common/message/error_message.h>
+#include <simpleipc/common/rpc_call_exception.h>
 
 using namespace simpleipc::server;
 
@@ -15,9 +16,17 @@ void rpc_handler::add_handler_async(std::string const& method, call_handler_asyn
 void rpc_handler::invoke(connection& conn, std::string const& method, nlohmann::json const& data,
                          result_handler const& handler) {
     auto h = handlers.find(method);
-    if (h == handlers.end())
-        throw std::runtime_error("No handler available for this method");
-    h->second(conn, method, data, std::move(handler));
+    if (h == handlers.end()) {
+        handler(rpc_result::error(rpc_error_codes::method_not_found, rpc_error_codes::to_string));
+        return;
+    }
+    try {
+        h->second(conn, method, data, std::move(handler));
+    } catch (rpc_call_exception& e) {
+        handler(rpc_result::error(e.code(), e.what(), e.data()));
+    } catch (std::exception& e) {
+        handler(rpc_result::error(rpc_error_codes::internal_error, rpc_error_codes::to_string));
+    }
 }
 
 void rpc_handler::invoke(connection& conn, rpc_message const& msg) {
