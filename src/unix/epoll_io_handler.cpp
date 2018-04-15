@@ -32,18 +32,18 @@ epoll_io_handler::~epoll_io_handler() {
     close(fd);
 }
 
-void epoll_io_handler::add_socket(int fd, data_callback cb) {
+void epoll_io_handler::add_socket(int fd, fd_callback data_cb, fd_callback close_cb) {
     int flags = fcntl(fd, F_GETFL, 0);
     if (flags >= 0)
         fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 
     cbm.lock();
-    cbs[fd] = cb;
+    cbs[fd] = {data_cb, close_cb};
     cbm.unlock();
 
     epoll_event event;
     event.data.fd = fd;
-    event.events = EPOLLIN | EPOLLET;
+    event.events = EPOLLIN | EPOLLHUP | EPOLLRDHUP | EPOLLET;
     epoll_ctl(this->fd, EPOLL_CTL_ADD, fd, &event);
 }
 
@@ -54,7 +54,7 @@ void epoll_io_handler::remove_socket(int fd) {
 
     epoll_event event;
     event.data.fd = fd;
-    event.events = EPOLLIN | EPOLLET;
+    event.events = EPOLLIN | EPOLLHUP | EPOLLRDHUP | EPOLLET;
     epoll_ctl(this->fd, EPOLL_CTL_DEL, fd, &event);
 }
 
@@ -66,10 +66,13 @@ void epoll_io_handler::run() {
         n = epoll_wait(fd, events, event_count, -1);
         cbm.lock();
         for (int i = 0; i < n; i++) {
-            if (events[i].events & EPOLLIN) {
-                auto& cb = cbs[events[i].data.fd];
-                if (cb)
-                    cb(events[i].data.fd);
+            auto& cb = cbs[events[i].data.fd];
+            if ((events[i].events & EPOLLRDHUP) || (events[i].events & EPOLLHUP)) {
+                if (cb.close_cb)
+                    cb.close_cb(events[i].data.fd);
+            } else if (events[i].events & EPOLLIN) {
+                if (cb.data_cb)
+                    cb.data_cb(events[i].data.fd);
             }
         }
         if (!running)

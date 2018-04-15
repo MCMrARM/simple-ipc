@@ -16,6 +16,7 @@ public:
     }
 
     void connection_closed(connection&) override {
+        close();
         cb->connection_closed();
     }
 

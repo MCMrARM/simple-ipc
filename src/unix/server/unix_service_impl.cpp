@@ -38,7 +38,7 @@ void unix_service_impl::bind(std::string const& path) {
         } catch (std::exception&) {}
         throw std::runtime_error("Failed to start listening on socket");
     }
-    io_handler::get_instance().add_socket(fd, [this](int) { handle_incoming(); });
+    io_handler::get_instance().add_socket(fd, [this](int) { handle_incoming(); }, [this](int) { close(); });
 }
 
 void unix_service_impl::close() {

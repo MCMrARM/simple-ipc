@@ -6,7 +6,7 @@
 using namespace simpleipc;
 
 void unix_connection::register_io_handler() {
-    io_handler::get_instance().add_socket(fd, [this](int) { handle_data_available(); });
+    io_handler::get_instance().add_socket(fd, [this](int) { handle_data_available(); }, [this](int) { on_close(); });
 }
 
 void unix_connection::unregister_io_handler() {
