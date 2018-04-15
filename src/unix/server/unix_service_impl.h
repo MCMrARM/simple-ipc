@@ -13,7 +13,7 @@ class unix_service_impl : public base_service_impl {
 private:
     int fd = -1;
     std::string path;
-    std::unordered_set<unix_connection*> connections;
+    std::unordered_set<std::shared_ptr<unix_connection>> connections;
 
     void handle_incoming();
 

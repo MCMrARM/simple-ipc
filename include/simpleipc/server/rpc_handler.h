@@ -34,7 +34,7 @@ public:
 
     void invoke(connection& conn, std::string const& method, nlohmann::json const& data, result_handler const& handler);
 
-    void invoke(connection& conn, rpc_message const& msg);
+    void invoke(std::shared_ptr<connection> conn, rpc_message const& msg);
 
 };
 

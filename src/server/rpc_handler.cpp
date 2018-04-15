@@ -29,11 +29,14 @@ void rpc_handler::invoke(connection& conn, std::string const& method, nlohmann::
     }
 }
 
-void rpc_handler::invoke(connection& conn, rpc_message const& msg) {
+void rpc_handler::invoke(std::shared_ptr<connection> conn, rpc_message const& msg) {
     if (msg.has_id()) {
         message_id id = msg.id();
-        connection* conn_ptr = &conn;
-        invoke(conn, msg.method(), msg.data(), [conn_ptr, id](rpc_result result) { // TODO: the connection may be destroyed before, change to shared_ptr
+        std::weak_ptr<connection> conn_weak(conn);
+        invoke(*conn, msg.method(), msg.data(), [conn_weak, id](rpc_result result) {
+            auto conn_ptr = conn_weak.lock();
+            if (!conn_ptr)
+                return;
             if (result.success())
                 conn_ptr->send_message(response_message(id, std::move(result._data)));
             else
@@ -41,6 +44,6 @@ void rpc_handler::invoke(connection& conn, rpc_message const& msg) {
                                                       std::move(result._data)));
         });
     } else {
-        invoke(conn, msg.method(), msg.data(), [](rpc_result) {});
+        invoke(*conn, msg.method(), msg.data(), [](rpc_result) {});
     }
 }

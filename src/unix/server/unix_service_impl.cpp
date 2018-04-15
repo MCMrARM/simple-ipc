@@ -8,9 +8,8 @@
 using namespace simpleipc::server;
 
 unix_service_impl::~unix_service_impl() {
-    for (unix_connection* conn : connections) {
+    for (auto& conn : connections) {
         conn->unregister_io_handler();
-        delete conn;
     }
 }
 
@@ -62,7 +61,7 @@ void unix_service_impl::handle_incoming() {
     int fd = accept(this->fd, (sockaddr*) &ss, &ss_len);
     if (fd < 0) // failed
         return;
-    unix_connection* conn = new unix_connection(fd);
+    std::shared_ptr<unix_connection> conn (new unix_connection(fd));
     conn->set_handler(this);
     conn->register_io_handler();
     connections.insert(conn);
@@ -70,8 +69,7 @@ void unix_service_impl::handle_incoming() {
 
 void unix_service_impl::connection_closed(connection& conn) {
     ((unix_connection&) conn).unregister_io_handler();
-    connections.erase((unix_connection*) &conn);
-    delete &conn;
+    connections.erase(std::dynamic_pointer_cast<unix_connection>(conn.shared_from_this()));
 }
 
 std::unique_ptr<service_impl> service_impl_factory::create_platform_service() {
