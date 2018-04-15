@@ -12,6 +12,8 @@ private:
 public:
     unix_connection(int fd) : fd(fd) {}
 
+    int get_fd() const { return fd; }
+
     void register_io_handler() override;
 
     void unregister_io_handler() override;

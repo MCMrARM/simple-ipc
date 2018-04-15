@@ -41,6 +41,9 @@ public:
         impl->open(path);
         send_hello_message();
     }
+    ~service_client() {
+        impl->close();
+    }
 
     rpc_call rpc(std::string method, nlohmann::json data) {
         return rpc_call(*this, std::move(method), std::move(data));

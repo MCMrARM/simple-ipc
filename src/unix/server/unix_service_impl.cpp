@@ -59,8 +59,10 @@ void unix_service_impl::handle_incoming() {
     sockaddr_storage ss;
     socklen_t ss_len = sizeof(ss);
     int fd = accept(this->fd, (sockaddr*) &ss, &ss_len);
-    if (fd < 0) // failed
+    if (fd < 0) { // failed
+        printf("accept failed\n");
         return;
+    }
     std::shared_ptr<unix_connection> conn (new unix_connection(fd));
     conn->set_handler(this);
     conn->register_io_handler();
@@ -68,8 +70,11 @@ void unix_service_impl::handle_incoming() {
 }
 
 void unix_service_impl::connection_closed(connection& conn) {
-    ((unix_connection&) conn).unregister_io_handler();
-    connections.erase(std::dynamic_pointer_cast<unix_connection>(conn.shared_from_this()));
+    auto unix_conn = std::dynamic_pointer_cast<unix_connection>(conn.shared_from_this());
+    unix_conn->unregister_io_handler();
+    shutdown(unix_conn->get_fd(), SHUT_RDWR);
+    ::close(unix_conn->get_fd());
+    connections.erase(unix_conn);
 }
 
 std::unique_ptr<service_impl> service_impl_factory::create_platform_service() {
