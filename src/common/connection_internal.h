@@ -70,6 +70,10 @@ protected:
         handler->connection_closed(*this);
     }
 
+    void on_error(rpc_call_exception_interface const& ex_as_rpc, std::exception_ptr ex_ptr = std::current_exception()) {
+        handler->handle_message_parse_error(*this, ex_ptr, ex_as_rpc);
+    }
+
 
     void handle_data_available();
 

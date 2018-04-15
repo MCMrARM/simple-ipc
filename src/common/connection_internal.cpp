@@ -33,13 +33,21 @@ void connection_internal::handle_data_available() {
                                                                       check_start - buffer_start_off);
             if (c < 0)
                 break;
+            bool has_error = true;
             try {
                 current_encoding->read_message(&buffer.data()[buffer_start_off], (size_t) c, current_message);
-                on_message(current_message);
+                has_error = false;
+            } catch (rpc_call_exception_interface& e) {
+                on_error(e);
+            } catch (nlohmann::json::parse_error& e) {
+                on_error(rpc_call_exception(rpc_error_codes::parse_error, rpc_error_codes::to_string));
+            } catch (nlohmann::json::exception& e) {
+                on_error(rpc_call_exception(rpc_error_codes::invalid_request, rpc_error_codes::to_string));
             } catch (std::exception& e) {
-                printf("Error processing message: %s\n", e.what());
-                // TODO: disconnect
+                on_error(rpc_call_exception(rpc_error_codes::internal_error, rpc_error_codes::to_string));
             }
+            if (!has_error)
+                on_message(current_message);
             current_message.clear();
 
             buffer_start_off += c;

@@ -31,7 +31,8 @@ public:
     static rpc_result error(rpc_error_code error_code, std::string error_text, nlohmann::json data = nullptr) {
         return rpc_result(error_code, std::move(error_text), std::move(data));
     }
-    static rpc_result error(rpc_error_code error_code, rpc_error_string_translator tr, nlohmann::json data = nullptr) {
+    static rpc_result error(rpc_error_code error_code, rpc_error_string_translator const& tr,
+                            nlohmann::json data = nullptr) {
         return rpc_result(error_code, tr(error_code), std::move(data));
     }
 

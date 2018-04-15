@@ -25,6 +25,11 @@ public:
         cb->handle_message(conn, msg);
     }
 
+    void handle_message_parse_error(connection& conn, std::exception_ptr ex_ptr,
+                                    rpc_call_exception_interface const& ex_as_rpc) override {
+        conn.send_message(error_message(ex_as_rpc.code(), ex_as_rpc.what(), ex_as_rpc.data()));
+    }
+
 };
 
 }
