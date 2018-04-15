@@ -36,7 +36,8 @@ void encoding::json::send_json(connection_internal& conn, nlohmann::json const& 
     std::string buf = data.dump();
     if (buf.length() + 1 > conn.get_max_out_msg_size())
         throw std::runtime_error("Message is too big");
-    conn.send_data(buf.c_str(), buf.size() + 1);
+    conn.send_data(buf.data(), buf.size());
+    conn.send_data("\n", 1);
 }
 
 ssize_t encoding::json::check_read_message_complete(const char* buf, size_t buf_size, size_t last_read_off) {
