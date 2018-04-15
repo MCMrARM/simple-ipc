@@ -12,6 +12,8 @@ namespace encoding {
 class encoding {
 
 public:
+    virtual const char* name() const = 0;
+
     virtual void send_message(connection_internal& conn, rpc_message const& msg) = 0;
 
     virtual void send_message(connection_internal& conn, response_message const& msg) = 0;

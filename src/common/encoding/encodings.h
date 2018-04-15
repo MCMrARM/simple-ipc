@@ -18,6 +18,8 @@ private:
 
     static encodings instance;
 
+    void add_encoding(encoding* enc);
+
 public:
     encodings();
 

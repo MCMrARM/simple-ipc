@@ -8,6 +8,9 @@ namespace encoding {
 class json : public encoding {
 
 public:
+    virtual const char* name() const { return "json"; }
+
+
     virtual void send_message(connection_internal& conn, rpc_message const& msg) override;
 
     virtual void send_message(connection_internal& conn, response_message const& msg) override;

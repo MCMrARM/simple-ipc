@@ -7,10 +7,14 @@ using namespace simpleipc::encoding;
 encodings encodings::instance;
 
 encodings::encodings() {
-    encodings_map["json"] = std::unique_ptr<encoding>(new json());
-    encodings_map["cbor"] = std::unique_ptr<encoding>(new json());
+    add_encoding(new json());
+    add_encoding(new json_cbor());
 
     default_encoding = encodings_map["json"].get();
+}
+
+void encodings::add_encoding(encoding* enc) {
+    encodings_map[enc->name()] = std::unique_ptr<encoding>(enc);
 }
 
 encoding* encodings::get_default_encoding() {
@@ -25,5 +29,5 @@ encoding* encodings::get_encoding_by_name(std::string const& name) {
 }
 
 std::vector<std::string> encodings::get_preferred_encodings() {
-    return {"cbor", "json"};
+    return {"json_cbor", "json"};
 }

@@ -38,6 +38,10 @@ public:
         this->handler = handler;
     }
 
+    void set_encoding(encoding::encoding* enc) {
+        current_encoding = enc;
+    }
+
     virtual void register_io_handler() = 0;
 
     virtual void unregister_io_handler() = 0;
