@@ -6,7 +6,7 @@
 
 using namespace simpleipc;
 
-void rpc_handler::add_handler(std::string const& method, call_handler_async handler) {
+void rpc_handler::add_handler_async(std::string const& method, call_handler_async handler) {
     if (handlers.count(method) > 0)
         throw std::runtime_error("A handler for this method already exists");
     handlers[method] = std::move(handler);

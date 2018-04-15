@@ -5,7 +5,7 @@ using namespace simpleipc::server;
 
 default_rpc_handler::default_rpc_handler() {
     using namespace std::placeholders;
-    add_handler(".hello", [this](connection& conn, nlohmann::json const& data) { return handle_hello(conn, data); });
+    add_handler(".hello", std::bind(&default_rpc_handler::handle_hello, this, _1, _3));
 }
 
 simpleipc::rpc_result default_rpc_handler::handle_hello(connection& conn, nlohmann::json const& data) {
