@@ -18,18 +18,15 @@ bool varint::try_decode_unsigned(const char* in, size_t ins, unsigned long long&
     unsigned char b;
     if (ins > 9)
         ins = 9;
-    in += ins;
-    ssize_t o = -ins;
-    while (o < 0) {
+    for (size_t o = 0; o < ins; o++) {
         b = (unsigned char) in[o];
-        tmp = tmp << 7 | b;
+        tmp = tmp | ((b & 127) << (o * 7));
         if (!(b >> 7)) {
             if (len)
-                *len = ins + o + 1;
+                *len = o + 1;
             res = tmp;
             return true;
         }
-        o++;
     }
     return false;
 }
