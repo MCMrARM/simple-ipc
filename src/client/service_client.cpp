@@ -7,7 +7,7 @@
 
 using namespace simpleipc::client;
 
-void service_client::add_rpc_cb(message_id msg, rpc_result_callback cb) {
+void service_client::add_rpc_cb(message_id msg, rpc_json_result_callback cb) {
     std::lock_guard<std::recursive_mutex> lock(cb_mutex);
     cbs[msg] = cb;
 }
@@ -16,7 +16,7 @@ void service_client::send_message(rpc_message const& msg) {
     impl->send_message(msg);
 }
 
-rpc_result_callback service_client::get_rpc_cb(message_id msg) {
+rpc_json_result_callback service_client::get_rpc_cb(message_id msg) {
     std::lock_guard<std::recursive_mutex> lock(cb_mutex);
     auto it = cbs.find(msg);
     if (it != cbs.end()) {
@@ -32,7 +32,7 @@ void service_client::handle_message(response_message const& msg) {
         return;
     auto cb = get_rpc_cb(msg.id());
     if (cb)
-        cb(rpc_result::response(msg.data()));
+        cb(rpc_json_result::response(msg.data()));
 }
 
 void service_client::handle_message(error_message const& msg) {
@@ -40,7 +40,7 @@ void service_client::handle_message(error_message const& msg) {
         return;
     auto cb = get_rpc_cb(msg.id());
     if (cb)
-        cb(rpc_result::error(msg.error_code(), msg.error_text(), msg.data()));
+        cb(rpc_json_result::error(msg.error_code(), msg.error_text(), msg.data()));
 }
 
 void service_client::send_hello_message() {

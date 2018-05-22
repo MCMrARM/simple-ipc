@@ -14,11 +14,11 @@ namespace server {
 class rpc_handler {
 
 public:
-    using result_handler = std::function<void (rpc_result)>;
+    using result_handler = std::function<void (rpc_json_result)>;
 
     using call_handler_async = std::function<void (connection& conn, std::string const& method, nlohmann::json const& data, result_handler const&)>;
 
-    using call_handler_sync = std::function<rpc_result (connection& conn, std::string const& method, nlohmann::json const& data)>;
+    using call_handler_sync = std::function<rpc_json_result (connection& conn, std::string const& method, nlohmann::json const& data)>;
 
 private:
     std::map<std::string, call_handler_async> handlers;

@@ -17,15 +17,15 @@ void rpc_handler::invoke(connection& conn, std::string const& method, nlohmann::
                          result_handler const& handler) {
     auto h = handlers.find(method);
     if (h == handlers.end()) {
-        handler(rpc_result::error(rpc_error_codes::method_not_found, rpc_error_codes::to_string));
+        handler(rpc_json_result::error(rpc_error_codes::method_not_found, rpc_error_codes::to_string));
         return;
     }
     try {
         h->second(conn, method, data, std::move(handler));
     } catch (rpc_call_exception_interface& e) {
-        handler(rpc_result::error(e.code(), e.what(), e.data()));
+        handler(rpc_json_result::error(e.code(), e.what(), e.data()));
     } catch (std::exception& e) {
-        handler(rpc_result::error(rpc_error_codes::internal_error, rpc_error_codes::to_string));
+        handler(rpc_json_result::error(rpc_error_codes::internal_error, rpc_error_codes::to_string));
     }
 }
 
@@ -33,7 +33,7 @@ void rpc_handler::invoke(std::shared_ptr<connection> conn, rpc_message const& ms
     if (msg.has_id()) {
         message_id id = msg.id();
         std::weak_ptr<connection> conn_weak(conn);
-        invoke(*conn, msg.method(), msg.data(), [conn_weak, id](rpc_result result) {
+        invoke(*conn, msg.method(), msg.data(), [conn_weak, id](rpc_json_result result) {
             auto conn_ptr = conn_weak.lock();
             if (!conn_ptr)
                 return;
@@ -44,6 +44,6 @@ void rpc_handler::invoke(std::shared_ptr<connection> conn, rpc_message const& ms
                                                       std::move(result._data)));
         });
     } else {
-        invoke(*conn, msg.method(), msg.data(), [](rpc_result) {});
+        invoke(*conn, msg.method(), msg.data(), [](rpc_json_result) {});
     }
 }

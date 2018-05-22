@@ -10,6 +10,7 @@ namespace server {
 class rpc_handler;
 }
 
+template <typename T>
 struct rpc_result {
 
 private:
@@ -17,15 +18,15 @@ private:
 
     rpc_error_code _error_code;
     std::string _error_text;
-    nlohmann::json _data;
+    T _data;
 
 public:
     rpc_result() {}
 
-    rpc_result(rpc_error_code error_code, std::string error_text, nlohmann::json data) :
+    rpc_result(rpc_error_code error_code, std::string error_text, T data) :
             _error_code(error_code), _error_text(std::move(error_text)), _data(std::move(data)) {}
 
-    static rpc_result response(nlohmann::json data) {
+    static rpc_result response(T data) {
         return rpc_result(rpc_error_codes::success, std::string(), std::move(data));
     }
     static rpc_result error(rpc_error_code error_code, std::string error_text, nlohmann::json data = nullptr) {
@@ -40,11 +41,13 @@ public:
 
     constexpr std::string const& error_text() const { return _error_text; }
 
-    constexpr nlohmann::json const& data() const { return _data; }
+    constexpr T const& data() const { return _data; }
 
     constexpr bool success() const { return error_code() == rpc_error_codes::success; }
 
 
 };
+
+using rpc_json_result = rpc_result<nlohmann::json>;
 
 }

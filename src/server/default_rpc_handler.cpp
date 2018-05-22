@@ -21,7 +21,7 @@ void default_rpc_handler::handle_hello(connection& conn, nlohmann::json const& d
             break;
         }
     }
-    handler(rpc_result::response({
+    handler(rpc_json_result::response({
             {"version", version::current_version},
             {"encoding", encoding->name()}
     }));

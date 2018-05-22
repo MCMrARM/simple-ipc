@@ -7,7 +7,7 @@
 #include "../common/connection.h"
 #include "../common/message/message_id.h"
 #include "service_client_impl.h"
-#include "rpc_call.h"
+#include "rpc_json_call.h"
 
 namespace simpleipc {
 namespace client {
@@ -15,12 +15,12 @@ namespace client {
 class service_client : private service_client_impl::callback_interface {
 
 private:
-    friend class rpc_call;
+    friend class rpc_json_call;
 
     std::unique_ptr<service_client_impl> impl;
     std::atomic<message_id> next_message_id;
     std::recursive_mutex cb_mutex;
-    std::unordered_map<message_id, rpc_result_callback> cbs;
+    std::unordered_map<message_id, rpc_json_result_callback> cbs;
 
     void handle_message(response_message const& msg) override;
 
@@ -29,9 +29,9 @@ private:
 
     void send_message(rpc_message const& msg);
 
-    void add_rpc_cb(message_id msg, rpc_result_callback cb);
+    void add_rpc_cb(message_id msg, rpc_json_result_callback cb);
 
-    rpc_result_callback get_rpc_cb(message_id msg);
+    rpc_json_result_callback get_rpc_cb(message_id msg);
 
 public:
     service_client(std::unique_ptr<service_client_impl> impl) : impl(std::move(impl)), next_message_id(0) {
@@ -45,8 +45,8 @@ public:
         impl->close();
     }
 
-    rpc_call rpc(std::string method, nlohmann::json data) {
-        return rpc_call(*this, std::move(method), std::move(data));
+    rpc_json_call rpc(std::string method, nlohmann::json data) {
+        return rpc_json_call(*this, std::move(method), std::move(data));
     }
 
     void connection_closed() override {}
