@@ -15,7 +15,7 @@ template <typename T>
 class rpc_call {
 
 private:
-    rpc_json_call& c;
+    rpc_json_call c;
     rpc_call_conversion_func<T> cf;
 
     rpc_result<T> convert(rpc_json_result const& r) {
@@ -32,7 +32,7 @@ private:
     }
 
 public:
-    rpc_call(rpc_json_call& c, rpc_call_conversion_func<T> cf) : c(c), cf(cf) {}
+    rpc_call(rpc_json_call c, rpc_call_conversion_func<T> cf) : c(std::move(c)), cf(cf) {}
 
     /**
      * Executes this call synchronically, returning the result.
