@@ -2,6 +2,7 @@
 #include <simpleipc/client/service_client.h>
 #include <simpleipc/common/message/rpc_message.h>
 #include <condition_variable>
+#include <future>
 
 using namespace simpleipc;
 using namespace simpleipc::client;
@@ -17,17 +18,10 @@ void rpc_call::call(rpc_result_callback cb) {
 }
 
 rpc_result rpc_call::call() {
-    std::condition_variable cv;
-    std::mutex mutex;
-    rpc_result result;
-    bool has_result = false;
-    call([&result, &has_result, &mutex, &cv](rpc_result new_result) {
-        std::lock_guard<std::mutex> lock (mutex);
-        result = std::move(new_result);
-        has_result = true;
-        cv.notify_all();
+    std::promise<rpc_result> result;
+    auto future = result.get_future();
+    call([&result](rpc_result new_result) {
+        result.set_value(std::move(new_result));
     });
-    std::unique_lock<std::mutex> lock (mutex);
-    cv.wait(lock, [&has_result] { return has_result; });
-    return result;
+    return future.get();
 }
