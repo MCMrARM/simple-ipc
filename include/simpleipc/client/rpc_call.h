@@ -18,7 +18,7 @@ private:
     rpc_json_call c;
     rpc_call_conversion_func<T> cf;
 
-    rpc_result<T> convert(rpc_json_result const& r) {
+    static rpc_result<T> convert(rpc_json_result const& r, rpc_call_conversion_func<T> cf) {
         if (r.success()) {
             try {
                 return rpc_result<T>::response(cf(r.data()));
@@ -38,15 +38,16 @@ public:
      * Executes this call synchronically, returning the result.
      */
     rpc_result<T> call() {
-        return convert(c.call());
+        return convert(c.call(), cf);
     }
 
     /**
      * Executes this call asynchronically, returning the result.
      */
     void call(rpc_result_callback<T> cb) {
-        c.call([this, cb](rpc_json_result r) {
-            cb(convert(r));
+        rpc_call_conversion_func<T> cf = this->cf;
+        c.call([cf, cb](rpc_json_result r) {
+            cb(convert(r, cf));
         });
     }
 
