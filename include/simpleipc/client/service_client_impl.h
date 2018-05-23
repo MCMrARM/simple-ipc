@@ -24,6 +24,8 @@ public:
 
     virtual void set_callback_interface(callback_interface* cb) = 0;
 
+    virtual void set_reconnect_handler(std::function<void ()> f) = 0;
+
     virtual void open(std::string const& path) = 0;
 
     virtual void send_message(rpc_message const& msg) = 0;
