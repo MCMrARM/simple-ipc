@@ -14,6 +14,8 @@ public:
     class callback_interface {
 
     public:
+        virtual void connection_opened() = 0;
+
         virtual void connection_closed() = 0;
 
         virtual void handle_message(response_message const& msg) = 0;

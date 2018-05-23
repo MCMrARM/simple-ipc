@@ -12,6 +12,10 @@ void service_client::add_rpc_cb(message_id msg, rpc_json_result_callback cb) {
     cbs[msg] = cb;
 }
 
+void service_client::connection_opened() {
+    send_hello_message();
+}
+
 void service_client::connection_closed() {
     cb_mutex.lock();
     auto cbs = std::move(this->cbs);

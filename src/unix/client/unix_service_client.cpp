@@ -27,6 +27,7 @@ void unix_service_client_impl::open(std::string const& path) {
     connection = std::unique_ptr<unix_connection>(new unix_connection(fd));
     connection->set_handler(this);
     connection->register_io_handler();
+    cb->connection_opened();
 }
 
 void unix_service_client_impl::close() {
