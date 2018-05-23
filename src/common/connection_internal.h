@@ -52,14 +52,24 @@ public:
 
 
     virtual void send_message(rpc_message const& msg) {
+#ifdef SIMPLEIPC_DEBUG_LOGGING
+        printf("Send rpc message: method=%s, data=%s\n", msg.method().c_str(), msg.data().dump().c_str());
+#endif
         current_encoding->send_message(*this, msg);
     }
 
     virtual void send_message(response_message const& msg) {
+#ifdef SIMPLEIPC_DEBUG_LOGGING
+        printf("Send response message: data=%s\n", msg.data().dump().c_str());
+#endif
         current_encoding->send_message(*this, msg);
     }
 
     virtual void send_message(error_message const& msg) {
+#ifdef SIMPLEIPC_DEBUG_LOGGING
+        printf("Send error message: code=%i, message=%s, data=%s\n", msg.error_code(), msg.error_text().c_str(),
+               msg.data().dump().c_str());
+#endif
         current_encoding->send_message(*this, msg);
     }
 
