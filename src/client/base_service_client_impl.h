@@ -8,7 +8,7 @@ namespace client {
 class base_service_client_impl : public service_client_impl {
 
 protected:
-    callback_interface* cb;
+    callback_interface* cb = nullptr;
     std::function<void ()> cb_reconnect;
 
 public:
@@ -22,17 +22,20 @@ public:
 
     void connection_closed(connection&) override {
         close();
-        cb->connection_closed();
+        if (cb)
+            cb->connection_closed();
         if (cb_reconnect)
             cb_reconnect();
     }
 
     void handle_message(connection&, response_message const& msg) override {
-        cb->handle_message(msg);
+        if (cb)
+            cb->handle_message(msg);
     }
 
     void handle_message(connection&, error_message const& msg) override {
-        cb->handle_message(msg);
+        if (cb)
+            cb->handle_message(msg);
     }
 
 };
