@@ -14,6 +14,7 @@ static constexpr rpc_error_code invalid_request = -32600;
 static constexpr rpc_error_code method_not_found = -32601;
 static constexpr rpc_error_code invalid_params = -32602;
 static constexpr rpc_error_code internal_error = -32603;
+static constexpr rpc_error_code connection_closed = -32000;
 
 const char* to_string(rpc_error_code code);
 

@@ -16,6 +16,8 @@ const char* rpc_error_codes::to_string(rpc_error_code code) {
             return "Invalid method parameters";
         case internal_error:
             return "Internal server error";
+        case connection_closed:
+            return "Connection was closed unexpectedly";
         default:
             return "Unknown error";
     }

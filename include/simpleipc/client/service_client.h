@@ -49,7 +49,7 @@ public:
         return rpc_json_call(*this, std::move(method), std::move(data));
     }
 
-    void connection_closed() override {}
+    void connection_closed() override;
 
 
     void send_hello_message();
