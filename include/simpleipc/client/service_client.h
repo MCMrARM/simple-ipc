@@ -33,6 +33,18 @@ private:
 
     rpc_json_result_callback get_rpc_cb(message_id msg);
 
+protected:
+    inline service_client_impl& get_impl() {
+        return *impl;
+    }
+    inline service_client_impl::callback_interface& get_cb_interface() {
+        return *this;
+    }
+
+    void connection_opened() override;
+
+    void connection_closed() override;
+
 public:
     service_client(std::unique_ptr<service_client_impl> impl) : impl(std::move(impl)), next_message_id(0) {
         this->impl->set_callback_interface(this);
@@ -48,13 +60,8 @@ public:
         return rpc_json_call(*this, std::move(method), std::move(data));
     }
 
-    void connection_opened() override;
-
-    void connection_closed() override;
-
 
     void send_hello_message();
-
 
 };
 
