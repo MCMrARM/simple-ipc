@@ -40,7 +40,7 @@ public:
     service_client(std::string const& path) : service_client(service_client_impl_factory::create_platform_service()) {
         impl->open(path);
     }
-    ~service_client() {
+    virtual ~service_client() {
         impl->close();
     }
 
