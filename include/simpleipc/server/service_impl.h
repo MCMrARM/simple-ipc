@@ -16,6 +16,10 @@ public:
     public:
         virtual void handle_message(connection& client, rpc_message const& req) = 0;
 
+        virtual void on_client_connected(connection& client) = 0;
+
+        virtual void on_client_disconnected(connection& client) = 0;
+
     };
 
     virtual void set_callback_interface(callback_interface* cb) = 0;

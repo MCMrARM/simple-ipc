@@ -69,6 +69,7 @@ void unix_service_impl::handle_incoming() {
     conn->set_handler(this);
     conn->register_io_handler();
     connections.insert(conn);
+    cb->on_client_connected(*conn);
 }
 
 void unix_service_impl::connection_closed(connection& conn) {
@@ -77,6 +78,7 @@ void unix_service_impl::connection_closed(connection& conn) {
     shutdown(unix_conn->get_fd(), SHUT_RDWR);
     ::close(unix_conn->get_fd());
     connections.erase(unix_conn);
+    cb->on_client_disconnected(*unix_conn);
 }
 
 std::unique_ptr<service_impl> service_impl_factory::create_platform_service() {

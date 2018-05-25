@@ -26,6 +26,10 @@ public:
         impl->close();
     }
 
+    void on_client_connected(connection& client) override {}
+
+    void on_client_disconnected(connection& client) override {}
+
     void handle_message(connection& client, simpleipc::rpc_message const& req) override {
         invoke(client.shared_from_this(), req);
     }
