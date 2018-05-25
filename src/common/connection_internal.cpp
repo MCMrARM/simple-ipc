@@ -28,14 +28,14 @@ void connection_internal::handle_data_available() {
         buffer_off += n;
         // process all messages
         while (buffer_off > buffer_start_off) {
-            ssize_t c = current_encoding->check_read_message_complete(&buffer.data()[buffer_start_off],
-                                                                      buffer_off - buffer_start_off,
-                                                                      check_start - buffer_start_off);
+            ssize_t c = current_encoding.load()->check_read_message_complete(&buffer.data()[buffer_start_off],
+                                                                             buffer_off - buffer_start_off,
+                                                                             check_start - buffer_start_off);
             if (c < 0)
                 break;
             bool has_error = true;
             try {
-                current_encoding->read_message(&buffer.data()[buffer_start_off], (size_t) c, current_message);
+                current_encoding.load()->read_message(&buffer.data()[buffer_start_off], (size_t) c, current_message);
                 has_error = false;
             } catch (rpc_call_exception_interface& e) {
                 on_error(e);

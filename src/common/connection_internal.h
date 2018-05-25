@@ -3,6 +3,7 @@
 #include <simpleipc/common/connection.h>
 #include <simpleipc/common/connection_handler.h>
 #include <mutex>
+#include <atomic>
 #include "encoding/encoding.h"
 #include "encoding/encodings.h"
 
@@ -22,12 +23,12 @@ private:
     std::vector<char> buffer;
     size_t buffer_start_off = 0;
     size_t buffer_off = 0;
-    encoding::encoding* current_encoding = encoding::encodings::get_default_encoding();
+    std::atomic<encoding::encoding*> current_encoding;
     size_t max_out_msg_size = MAX_BUFFER_SIZE;
     message_container current_message;
 
 public:
-    connection_internal() : buffer(BUFFER_SIZE) {
+    connection_internal() : buffer(BUFFER_SIZE), current_encoding(encoding::encodings::get_default_encoding()) {
     }
 
     inline size_t get_max_out_msg_size() const {
@@ -55,14 +56,14 @@ public:
 #ifdef SIMPLEIPC_DEBUG_LOGGING
         printf("Send rpc message: method=%s, data=%s\n", msg.method().c_str(), msg.data().dump().c_str());
 #endif
-        current_encoding->send_message(*this, msg);
+        current_encoding.load()->send_message(*this, msg);
     }
 
     virtual void send_message(response_message const& msg) {
 #ifdef SIMPLEIPC_DEBUG_LOGGING
         printf("Send response message: data=%s\n", msg.data().dump().c_str());
 #endif
-        current_encoding->send_message(*this, msg);
+        current_encoding.load()->send_message(*this, msg);
     }
 
     virtual void send_message(error_message const& msg) {
@@ -70,7 +71,7 @@ public:
         printf("Send error message: code=%i, message=%s, data=%s\n", msg.error_code(), msg.error_text().c_str(),
                msg.data().dump().c_str());
 #endif
-        current_encoding->send_message(*this, msg);
+        current_encoding.load()->send_message(*this, msg);
     }
 
 protected:

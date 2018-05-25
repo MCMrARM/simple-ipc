@@ -17,6 +17,9 @@ void service_client::connection_opened() {
 }
 
 void service_client::connection_closed() {
+    hello_response_mutex.lock();
+    hello_response_value = false;
+    hello_response_mutex.unlock();
     cb_mutex.lock();
     auto cbs = std::move(this->cbs);
     cb_mutex.unlock();
@@ -25,6 +28,11 @@ void service_client::connection_closed() {
 }
 
 void service_client::send_message(rpc_message const& msg) {
+    {
+        std::lock_guard<std::mutex> lock(hello_response_mutex);
+        if (!hello_response_value && msg.method() != ".hello")
+            throw std::runtime_error("Haven't got hello reply yet");
+    }
     impl->send_message(msg);
 }
 
@@ -56,15 +64,25 @@ void service_client::handle_message(error_message const& msg) {
 }
 
 void service_client::send_hello_message() {
-    auto res = rpc(".hello", {
+    rpc(".hello", {
             {"version", version::current_version},
             {"encodings", encoding::encodings::get_preferred_encodings()}
-    }).call();
-    if (!res.success())
-        return;
-    auto conn = impl->get_connection();
-    std::string enc = res.data().at("encoding");
-    if (conn != nullptr)
-        ((connection_internal*) conn)->set_encoding(
-                encoding::encodings::get_encoding_by_name(res.data().at("encoding")));
+    }).call([this](rpc_json_result res) {
+        if (res.success()) {
+            auto conn = impl->get_connection();
+            std::string enc = res.data().at("encoding");
+            if (conn != nullptr)
+                ((connection_internal*) conn)->set_encoding(
+                        encoding::encodings::get_encoding_by_name(res.data().at("encoding")));
+        }
+
+        std::unique_lock<std::mutex> lock (hello_response_mutex);
+        hello_response_value = true;
+        hello_response_cv.notify_all();
+    });
+}
+
+void service_client::wait_for_hello_message() {
+    std::unique_lock<std::mutex> lock (hello_response_mutex);
+    hello_response_cv.wait(lock, [this]() { return hello_response_value; });
 }

@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <mutex>
 #include <atomic>
+#include <condition_variable>
 #include "../common/connection.h"
 #include "../common/message/message_id.h"
 #include "service_client_impl.h"
@@ -21,6 +22,9 @@ private:
     std::atomic<message_id> next_message_id;
     std::recursive_mutex cb_mutex;
     std::unordered_map<message_id, rpc_json_result_callback> cbs;
+    bool hello_response_value = false;
+    std::mutex hello_response_mutex;
+    std::condition_variable hello_response_cv;
 
     void handle_message(response_message const& msg) override;
 
@@ -51,6 +55,7 @@ public:
     }
     service_client(std::string const& path) : service_client(service_client_impl_factory::create_platform_service()) {
         impl->open(path);
+        wait_for_hello_message();
     }
     virtual ~service_client() {
         impl->close();
@@ -62,6 +67,8 @@ public:
 
 
     void send_hello_message();
+
+    void wait_for_hello_message();
 
 };
 
