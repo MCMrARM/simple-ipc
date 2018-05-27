@@ -24,7 +24,7 @@ void service_client::connection_closed() {
     auto cbs = std::move(this->cbs);
     cb_mutex.unlock();
     for (auto& cb : cbs)
-        cb.second(rpc_json_result::error(rpc_error_codes::internal_error, rpc_error_codes::to_string));
+        cb.second(rpc_json_result::error(rpc_error_codes::connection_closed, rpc_error_codes::to_string));
 }
 
 void service_client::send_message(rpc_message const& msg) {
