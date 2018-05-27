@@ -24,11 +24,11 @@ void unix_service_client_impl::open(std::string const& path) {
         } catch (std::exception&) {}
         throw std::runtime_error("Failed to connect");
     }
-    connection = std::unique_ptr<unix_connection>(new unix_connection(fd));
+    connection = std::make_shared<unix_connection>(fd);
     connection->set_handler(this);
     connection->register_io_handler();
     if (cb)
-        cb->connection_opened();
+        cb.load()->connection_opened();
 }
 
 void unix_service_client_impl::close() {

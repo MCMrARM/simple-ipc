@@ -58,6 +58,7 @@ public:
         wait_for_hello_message();
     }
     virtual ~service_client() {
+        impl->set_callback_interface(nullptr);
         impl->close();
     }
 

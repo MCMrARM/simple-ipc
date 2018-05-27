@@ -66,13 +66,15 @@ void epoll_io_handler::run() {
         n = epoll_wait(fd, events, event_count, -1);
         cbm.lock();
         for (int i = 0; i < n; i++) {
-            auto& cb = cbs[events[i].data.fd];
+            auto cb = cbs.find(events[i].data.fd);
+            if (cb == cbs.end())
+                continue;
             if ((events[i].events & EPOLLRDHUP) || (events[i].events & EPOLLHUP)) {
-                if (cb.close_cb)
-                    cb.close_cb(events[i].data.fd);
+                if (cb->second.close_cb)
+                    cb->second.close_cb(events[i].data.fd);
             } else if (events[i].events & EPOLLIN) {
-                if (cb.data_cb)
-                    cb.data_cb(events[i].data.fd);
+                if (cb->second.data_cb)
+                    cb->second.data_cb(events[i].data.fd);
             }
         }
         if (!running)

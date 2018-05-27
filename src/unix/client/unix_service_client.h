@@ -11,7 +11,7 @@ class unix_service_client_impl : public base_service_client_impl {
 private:
     int fd = -1;
     std::string path;
-    std::unique_ptr<unix_connection> connection;
+    std::shared_ptr<unix_connection> connection;
 
 public:
     void open(std::string const& path) override;

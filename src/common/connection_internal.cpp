@@ -3,6 +3,8 @@
 using namespace simpleipc;
 
 void connection_internal::handle_data_available() {
+    auto handle = shared_from_this();
+
     while (true) {
         if (buffer_off == buffer.size()) {
             if (buffer_start_off == 0) {
