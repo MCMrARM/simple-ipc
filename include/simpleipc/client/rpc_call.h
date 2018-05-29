@@ -12,6 +12,49 @@ template <typename T>
 using rpc_call_conversion_func = T (*)(nlohmann::json const&);
 
 template <typename T>
+class rpc_call;
+
+template <>
+class rpc_call<void> {
+
+private:
+    rpc_json_call c;
+
+    static rpc_result<void> convert(rpc_json_result const& r) {
+        if (r.success())
+            return rpc_result<void>::response();
+        return rpc_result<void>::error(r.error_code(), r.error_text(), r.error_data());
+    }
+
+public:
+    rpc_call(rpc_json_call c) : c(std::move(c)) {}
+
+    /**
+     * Executes this call synchronically, returning the result.
+     */
+    rpc_result<void> call() {
+        return convert(c.call());
+    }
+
+    /**
+     * Executes this call asynchronically, returning the result.
+     */
+    void call(rpc_result_callback<void> cb) {
+        c.call([cb](rpc_json_result r) {
+            cb(convert(r));
+        });
+    }
+
+    /**
+     * Executes this call asynchronically, ignoring the result.
+     */
+    void run() {
+        c.run();
+    }
+
+};
+
+template <typename T>
 class rpc_call {
 
 private:
