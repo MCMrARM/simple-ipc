@@ -69,9 +69,7 @@ void kqueue_io_handler::run() {
     }
 }
 
-#ifdef __APPLE__
 io_handler& io_handler::get_instance() {
     static kqueue_io_handler instance;
     return instance;
 }
-#endif

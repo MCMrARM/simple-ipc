@@ -84,9 +84,7 @@ void epoll_io_handler::run() {
     delete[] events;
 }
 
-#ifndef __APPLE__
 io_handler& io_handler::get_instance() {
     static epoll_io_handler instance;
     return instance;
 }
-#endif
