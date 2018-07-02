@@ -14,6 +14,7 @@ private:
         fd_callback data_cb, close_cb;
     };
 
+    int kq;
     std::unordered_map<int, callback_set> cbs;
     bool running = true;
     std::recursive_mutex cbm;
