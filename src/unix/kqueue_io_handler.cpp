@@ -22,13 +22,17 @@ kqueue_io_handler::~kqueue_io_handler() {
 }
 
 void kqueue_io_handler::add_socket(int fd, fd_callback data_cb, fd_callback close_cb) {
-    struct kevent k_set;
-    EV_SET(&k_set, fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
-    kevent(kq, &k_set, 1, NULL, 0, NULL);
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags >= 0)
+        fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 
     cbm.lock();
     cbs[fd] = {data_cb, close_cb};
     cbm.unlock();
+
+    struct kevent k_set;
+    EV_SET(&k_set, fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
+    kevent(kq, &k_set, 1, NULL, 0, NULL);
 }
 
 void kqueue_io_handler::remove_socket(int fd) {
@@ -46,10 +50,10 @@ void kqueue_io_handler::run() {
     struct kevent ev_list[64];
     int n;
 
-    while(true) {
-        cbm.lock();
+    while (true) {
         n = kevent(kq, NULL, 0, ev_list, 64, NULL);
-        for(int i = 0; i < n; i++) {
+        cbm.lock();
+        for (int i = 0; i < n; i++) {
             auto cb = cbs.find(ev_list[i].ident);
             if (cb == cbs.end())
                 continue;
@@ -63,7 +67,7 @@ void kqueue_io_handler::run() {
             }
         }
 
-        if(!running)
+        if (!running)
             break;
         cbm.unlock();
     }
