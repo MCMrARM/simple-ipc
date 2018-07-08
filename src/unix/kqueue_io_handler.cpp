@@ -4,6 +4,7 @@
 #include <sys/event.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 using namespace simpleipc;
 
