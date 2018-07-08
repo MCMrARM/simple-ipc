@@ -15,6 +15,7 @@ private:
     };
 
     int kq;
+    int stop_pipe[2];
     std::unordered_map<int, callback_set> cbs;
     bool running = true;
     std::recursive_mutex cbm;

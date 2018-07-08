@@ -10,15 +10,25 @@ using namespace simpleipc;
 kqueue_io_handler::kqueue_io_handler() {
     kq = kqueue();
 
+    pipe(stop_pipe);
+
+    struct kevent k_set;
+    EV_SET(&k_set, stop_pipe[1], EVFILT_READ, EV_ADD, 0, 0, NULL);
+    kevent(kq, &k_set, 1, NULL, 0, NULL);
+
     thread = std::thread(std::bind(&kqueue_io_handler::run, this));
 }
 
 kqueue_io_handler::~kqueue_io_handler() {
+    char c = 0;
+    write(stop_pipe[0], &c, 1);
     cbm.lock();
     running = false;
     cbm.unlock();
     thread.join();
     close(kq);
+    close(stop_pipe[0]);
+    close(stop_pipe[1]);
 }
 
 void kqueue_io_handler::add_socket(int fd, fd_callback data_cb, fd_callback close_cb) {
@@ -55,6 +65,8 @@ void kqueue_io_handler::run() {
         cbm.lock();
         for (int i = 0; i < n; i++) {
             auto cb = cbs.find(ev_list[i].ident);
+            if (ev_list[i].ident == stop_pipe[1] && (ev_list[i].filter & EVFILT_READ))
+                break;
             if (cb == cbs.end())
                 continue;
 
