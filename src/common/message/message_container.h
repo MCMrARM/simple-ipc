@@ -40,6 +40,8 @@ struct message_container {
             case message_type::error:
                 message_error = error_message();
                 break;
+            default:
+                break;
         }
         type = message_type::none;
     }
