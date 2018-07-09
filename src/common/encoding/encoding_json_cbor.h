@@ -8,14 +8,14 @@ namespace encoding {
 class json_cbor : public encoding {
 
 public:
-    virtual const char* name() const { return "json_cbor"; }
+    const char* name() const override { return "json_cbor"; }
 
 
-    virtual void send_message(connection_internal& conn, rpc_message const& msg) override;
+    void send_message(connection_internal& conn, rpc_message const& msg) override;
 
-    virtual void send_message(connection_internal& conn, response_message const& msg) override;
+    void send_message(connection_internal& conn, response_message const& msg) override;
 
-    virtual void send_message(connection_internal& conn, error_message const& msg) override;
+    void send_message(connection_internal& conn, error_message const& msg) override;
 
     void send_json(connection_internal& conn, nlohmann::json const& data);
 
