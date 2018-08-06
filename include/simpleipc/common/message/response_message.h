@@ -18,7 +18,7 @@ public:
     response_message(message_id id, nlohmann::json data) : message_with_id(id), _data(std::move(data)) {}
 
 
-    constexpr nlohmann::json const& data() const { return _data; }
+    inline nlohmann::json const& data() const { return _data; }
 };
 
 }

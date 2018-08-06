@@ -40,13 +40,13 @@ public:
         return rpc_result(error_code, tr(error_code), std::move(data));
     }
 
-    constexpr rpc_error_code error_code() const { return _error_code; }
+    inline rpc_error_code error_code() const { return _error_code; }
 
-    constexpr std::string const& error_text() const { return _error_text; }
+    inline std::string const& error_text() const { return _error_text; }
 
-    constexpr nlohmann::json const& error_data() const { return _error_data; }
+    inline nlohmann::json const& error_data() const { return _error_data; }
 
-    constexpr bool success() const { return error_code() == rpc_error_codes::success; }
+    inline bool success() const { return error_code() == rpc_error_codes::success; }
 
 
 };
@@ -81,15 +81,15 @@ public:
         return rpc_result(error_code, tr(error_code), std::move(data));
     }
 
-    constexpr rpc_error_code error_code() const { return _error_code; }
+    inline rpc_error_code error_code() const { return _error_code; }
 
-    constexpr std::string const& error_text() const { return _error_text; }
+    inline std::string const& error_text() const { return _error_text; }
 
-    constexpr nlohmann::json const& error_data() const { return _error_data; }
+    inline nlohmann::json const& error_data() const { return _error_data; }
 
-    constexpr T const& data() const { return _data; }
+    inline T const& data() const { return _data; }
 
-    constexpr bool success() const { return error_code() == rpc_error_codes::success; }
+    inline bool success() const { return error_code() == rpc_error_codes::success; }
 
 
 };

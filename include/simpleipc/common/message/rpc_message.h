@@ -21,9 +21,9 @@ public:
             message_with_id(id), _method(std::move(method)), _data(std::move(data)) {}
 
 
-    constexpr std::string const& method() const { return _method; }
+    inline std::string const& method() const { return _method; }
 
-    constexpr nlohmann::json const& data() const { return _data; }
+    inline nlohmann::json const& data() const { return _data; }
 };
 
 }

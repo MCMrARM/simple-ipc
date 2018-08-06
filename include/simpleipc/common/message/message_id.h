@@ -18,9 +18,9 @@ protected:
     message_with_id(message_id id) : _has_id(true), _id(id) {}
 
 public:
-    constexpr message_id id() const { return _id; }
+    message_id id() const { return _id; }
 
-    constexpr bool has_id() const { return _has_id; }
+    bool has_id() const { return _has_id; }
 
 };
 

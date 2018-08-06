@@ -24,11 +24,11 @@ public:
             _data(std::move(data)) {}
 
 
-    constexpr rpc_error_code error_code() const { return _error_code; }
+    inline rpc_error_code error_code() const { return _error_code; }
 
-    constexpr std::string const& error_text() const { return _error_text; }
+    inline std::string const& error_text() const { return _error_text; }
 
-    constexpr nlohmann::json const& data() const { return _data; }
+    inline nlohmann::json const& data() const { return _data; }
 };
 
 }
