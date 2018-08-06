@@ -84,7 +84,6 @@ void epoll_io_handler::run() {
     delete[] events;
 }
 
-
 io_handler& io_handler::get_instance() {
     static epoll_io_handler instance;
     return instance;
