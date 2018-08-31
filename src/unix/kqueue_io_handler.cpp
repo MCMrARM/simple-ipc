@@ -14,7 +14,7 @@ kqueue_io_handler::kqueue_io_handler() {
     pipe(stop_pipe);
 
     struct kevent k_set;
-    EV_SET(&k_set, stop_pipe[1], EVFILT_READ, EV_ADD, 0, 0, NULL);
+    EV_SET(&k_set, stop_pipe[0], EVFILT_READ, EV_ADD, 0, 0, NULL);
     kevent(kq, &k_set, 1, NULL, 0, NULL);
 
     thread = std::thread(std::bind(&kqueue_io_handler::run, this));
@@ -25,7 +25,7 @@ kqueue_io_handler::~kqueue_io_handler() {
     running = false;
     cbm.unlock();
     char c = 0;
-    write(stop_pipe[0], &c, 1);
+    write(stop_pipe[1], &c, 1);
     thread.join();
     close(kq);
     close(stop_pipe[0]);
