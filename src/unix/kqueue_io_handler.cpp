@@ -21,11 +21,11 @@ kqueue_io_handler::kqueue_io_handler() {
 }
 
 kqueue_io_handler::~kqueue_io_handler() {
-    char c = 0;
-    write(stop_pipe[0], &c, 1);
     cbm.lock();
     running = false;
     cbm.unlock();
+    char c = 0;
+    write(stop_pipe[0], &c, 1);
     thread.join();
     close(kq);
     close(stop_pipe[0]);
