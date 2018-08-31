@@ -80,8 +80,10 @@ void kqueue_io_handler::run() {
             }
         }
 
-        if (!running)
+        if (!running) {
+            cbm.unlock();
             break;
+        }
         cbm.unlock();
     }
 }
