@@ -24,6 +24,8 @@ public:
 
     };
 
+    virtual ~service_client_impl() = default;
+
     virtual void set_callback_interface(callback_interface* cb) = 0;
 
     virtual void open(std::string const& path) = 0;

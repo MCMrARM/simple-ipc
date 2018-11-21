@@ -22,6 +22,8 @@ public:
 
     };
 
+    virtual ~service_impl() = default;
+
     virtual void set_callback_interface(callback_interface* cb) = 0;
 
     virtual void bind(std::string const& path) = 0;
