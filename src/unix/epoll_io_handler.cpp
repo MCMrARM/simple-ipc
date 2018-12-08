@@ -77,8 +77,10 @@ void epoll_io_handler::run() {
                     cb->second.data_cb(events[i].data.fd);
             }
         }
-        if (!running)
+        if (!running) {
+            cbm.unlock();
             break;
+        }
         cbm.unlock();
     }
     delete[] events;
