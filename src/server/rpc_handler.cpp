@@ -20,13 +20,13 @@ void rpc_handler::invoke(connection& conn, std::string const& method, nlohmann::
         handler(rpc_json_result::error(rpc_error_codes::method_not_found, rpc_error_codes::to_string));
         return;
     }
-    //try {
+    try {
         h->second(conn, method, data, std::move(handler));
-    /*} catch (rpc_call_exception_interface& e) {
+    } catch (rpc_call_exception_interface& e) {
         handler(rpc_json_result::error(e.code(), e.what(), e.data()));
     } catch (std::exception& e) {
         handler(rpc_json_result::error(rpc_error_codes::internal_error, rpc_error_codes::to_string));
-    }*/
+    }
 }
 
 void rpc_handler::invoke(std::shared_ptr<connection> conn, rpc_message const& msg) {

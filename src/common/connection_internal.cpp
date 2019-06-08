@@ -36,9 +36,9 @@ void connection_internal::handle_data_available() {
             if (c < 0)
                 break;
             bool has_error = true;
-            //try {
+            try {
                 current_encoding.load()->read_message(&buffer.data()[buffer_start_off], (size_t) c, current_message);
-                has_error = false;/*
+                has_error = false;
             } catch (rpc_call_exception_interface& e) {
                 on_error(e);
             } catch (nlohmann::json::parse_error& e) {
@@ -47,7 +47,7 @@ void connection_internal::handle_data_available() {
                 on_error(rpc_call_exception(rpc_error_codes::invalid_request, rpc_error_codes::to_string));
             } catch (std::exception& e) {
                 on_error(rpc_call_exception(rpc_error_codes::internal_error, rpc_error_codes::to_string));
-            }*/
+            }
             if (!has_error)
                 on_message(current_message);
             current_message.clear();
