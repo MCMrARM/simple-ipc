@@ -30,13 +30,13 @@ void service_client::connection_closed() {
 void service_client::send_message(rpc_message const& msg) {
     std::unique_lock<std::mutex> lock(hello_response_mutex);
     if (!hello_response_value && msg.method() != ".hello") {
-        lock.release();
+        lock.unlock();
         auto cb = get_rpc_cb(msg.id());
         if (cb)
             cb(rpc_json_result::error(simpleipc::rpc_error_codes::no_hello_reply, "Haven't got hello reply yet"));
         return;
     }
-    lock.release();
+    lock.unlock();
     impl->send_message(msg);
 }
 
