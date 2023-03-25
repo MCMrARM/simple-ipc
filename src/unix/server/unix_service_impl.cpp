@@ -1,6 +1,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
+#include <stdexcept>
 #include <simpleipc/common/io_handler.h>
 #include "unix_service_impl.h"
 #include "../common/unix_connection.h"

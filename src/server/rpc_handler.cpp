@@ -4,6 +4,7 @@
 #include <simpleipc/common/message/response_message.h>
 #include <simpleipc/common/message/error_message.h>
 #include <simpleipc/common/rpc_call_exception.h>
+#include <stdexcept>
 
 using namespace simpleipc::server;
 

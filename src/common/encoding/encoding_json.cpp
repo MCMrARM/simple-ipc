@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <simpleipc/common/rpc_call_exception.h>
 #include "encoding_json.h"
 
