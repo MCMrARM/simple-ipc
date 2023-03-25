@@ -1,5 +1,4 @@
 #include "connection_internal.h"
-#include <stdexcept>
 
 using namespace simpleipc;
 

@@ -1,7 +1,6 @@
 #include "unix_connection.h"
 
 #include <unistd.h>
-#include <stdexcept>
 #include <simpleipc/common/io_handler.h>
 
 using namespace simpleipc;
